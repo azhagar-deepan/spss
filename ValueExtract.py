@@ -2,10 +2,11 @@ import SpssClient
 
 SpssClient.StartClient()
 
-def PivotData(TableObj,Row=False):
+
+def PivotData(TableObj, Row=False):
     datacells = TableObj.DataCellArray()
     PivotMgr = TableObj.PivotManager()
-    
+
     RowDim = PivotMgr.GetRowDimension(0)
     ColDim = PivotMgr.GetColumnDimension(0)
     Data = []
@@ -19,7 +20,8 @@ def PivotData(TableObj,Row=False):
         return Data
     else:
         return list(zip(*Data))
-    
+
+
 def ValueExtract(TableObj, R, C):
     datacells = TableObj.DataCellArray()
     PivotMgr = TableObj.PivotManager()
@@ -69,34 +71,35 @@ def ValueExtract(TableObj, R, C):
                 index = e
     return Data[index][C]
 
-def ColData(TableObj,u,n,c):
+
+def ColData(TableObj, u, n, c):
     PivotMgr = TableObj.PivotManager()
     ColDim = PivotMgr.GetColumnDimension(0)
     RowDim = PivotMgr.GetRowDimension(1)
-    Columndata = []    
+    Columndata = []
     if u != 0:
         for i in range(RowDim.GetNumCategories()):
-            Columndata.append(ValueExtract(TableObj,[i,u],c))
+            Columndata.append(ValueExtract(TableObj, [i, u], c))
     else:
         for i in range(RowDim.GetNumCategories()):
-            for j in range(1,n+1):
-                Columndata.append(ValueExtract(TableObj,[i,j],c))
+            for j in range(1, n + 1):
+                Columndata.append(ValueExtract(TableObj, [i, j], c))
     return Columndata
-    
 
-def RowData(TableObj,n,u):
+
+def RowData(TableObj, n, u):
     PivotMgr = TableObj.PivotManager()
     RowDim = PivotMgr.GetRowDimension(1)
     ColDim = PivotMgr.GetColumnDimension(0)
 
     Rowdata = []
-    
-    for j in range(1,ColDim.GetNumCategories()+1):
-        Rowdata.append(ValueExtract(TableObj,[n,u],j))
+
+    for j in range(1, ColDim.GetNumCategories() + 1):
+        Rowdata.append(ValueExtract(TableObj, [n, u], j))
     return Rowdata
 
 
-def ValuePush(TableObj, R, C,value,decimal):
+def ValuePush(TableObj, R, C, value, decimal):
     datacells = TableObj.DataCellArray()
     PivotMgr = TableObj.PivotManager()
     ColLabels = TableObj.ColumnLabelArray()
@@ -105,7 +108,7 @@ def ValuePush(TableObj, R, C,value,decimal):
     C -= 1
     Row = {}
     Col = {}
-        
+
     for m in range(PivotMgr.GetNumColumnDimensions() - 1, -1, -1):
         ColDim = PivotMgr.GetColumnDimension(m)
         Col[ColDim.GetDimensionName()] = []
@@ -136,35 +139,40 @@ def ValuePush(TableObj, R, C,value,decimal):
             else:
                 index = e
     if decimal != False:
-        datacells.SetValueAt(index,C,value)
-        datacells.SetNumericFormatAtWithDecimal(index,C,"#.#",decimal)    
+        datacells.SetValueAt(index, C, value)
+        datacells.SetNumericFormatAtWithDecimal(index, C, "#.#", decimal)
     else:
-        datacells.SetValueAt(index,C,value)
+        datacells.SetValueAt(index, C, value)
 
-def RowPush(TableObj,n,u,List,decimal):
+
+def RowPush(TableObj, n, u, List, decimal):
     PivotMgr = TableObj.PivotManager()
     RowDim = PivotMgr.GetRowDimension(1)
     ColDim = PivotMgr.GetColumnDimension(0)
 
-    for j in range(1,ColDim.GetNumCategories()+1):
-        ValuePush(TableObj,[n,u],j,List[j-1],decimal)
+    for j in range(1, ColDim.GetNumCategories() + 1):
+        ValuePush(TableObj, [n, u], j, List[j - 1], decimal)
 
-def ColPush(TableObj,u,n,c,List,decimal):
+
+def ColPush(TableObj, u, n, c, List, decimal):  # U represents the values at the dim 0
     PivotMgr = TableObj.PivotManager()
-    RowDim = PivotMgr.GetRowDimension(1)
+    datacells = TableObj.DataCellArray()
     ColDim = PivotMgr.GetColumnDimension(0)
 
     if u != 0:
+        RowDim = PivotMgr.GetRowDimension(1)
         for i in range(RowDim.GetNumCategories()):
-            ValuePush(TableObj,[i,u],c,List[i],decimal)
+            ValuePush(TableObj, [i, u], c, List[i], decimal)
     else:
-        f = RowDim.GetNumCategories()*len(list(range(1,n+1)))
-        g = 0
+        RowDim = PivotMgr.GetRowDimension(0)
         for i in range(RowDim.GetNumCategories()):
-            for j in range(1,n+1):
-                if g < f:
-                    ValuePush(TableObj,[i,j],c,List[g],decimal)
-                    g+=1
+            if decimal != False:
+                datacells.SetValueAt(i, c, List[i])
+                datacells.SetNumericFormatAtWithDecimal(i, c, "#.#", decimal)
+            else:
+                datacells.SetValueAt(i, c, List[i])
+
+
 def accessObj(a):
     oItem = SpssClient.GetDesignatedOutputDoc().GetOutputItems().GetItemAt(a)
     if oItem.GetType() == SpssClient.OutputItemType.PIVOT:
