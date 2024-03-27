@@ -79,7 +79,6 @@ def IndepT(groups, code, testVar, precision, flag):
                     Prev_Table.ColumnLabelArray().SetValueAt(3, 1, "Mean±S.D")
                     for i in range(2):
                         pL = mean[i::2]
-
                         ColPush(Prev_Table, 0, 1, i, pL, False)
 
                     ColPush(Prev_Table, 0, 2, 2, L, p_decimal)
