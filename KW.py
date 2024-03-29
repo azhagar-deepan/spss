@@ -2,13 +2,13 @@ import SpssClient, spss
 from rpstatspss import *
 
 
-def KW(groups, Range, testVar, precision,flag):
+def KW(groups, Range, testVar, precision, flag):
     SpssClient.StartClient()
     cat = list(range(Range[0], Range[1] + 1))
     mean_decimal, sd_decimal, p_decimal = precision[0], precision[1], precision[2]
     l = [str(i) for i in Range]
     codeX = "(" + " ".join(l) + ")"
-    if flag:        
+    if flag:
         tab = 1
         for eachGroup in groups:
             table = []
@@ -76,7 +76,9 @@ def KW(groups, Range, testVar, precision,flag):
                             Q3.append(List[j + 2][i])
                     # print(median,Q1,Q3)
 
-                    median = [str(round(float(number), mean_decimal)) for number in median]
+                    median = [
+                        str(round(float(number), mean_decimal)) for number in median
+                    ]
 
                     Q1 = [str(round(float(number), sd_decimal)) for number in Q1]
                     Q3 = [str(round(float(number), sd_decimal)) for number in Q3]
@@ -118,8 +120,10 @@ def KW(groups, Range, testVar, precision,flag):
                         pL = median_ar[i :: len(cat)]
                         ColPush(C_Table, 0, 1, i, pL, False)
 
-                    C_Table.PivotManager().GetRowDimension(0).SetDimensionName("Variable")
-                    C_Table.ShowAll()
+                    C_Table.PivotManager().GetRowDimension(0).SetDimensionName(
+                        "Variable"
+                    )
+                    # C_Table.ShowAll()
                     Title = "Output Table " + str(tab)
                     Next_Table.SetTitleText(Title)
                     C_Table.SetTitleText(f"K-W {str(tab)}")
